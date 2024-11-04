@@ -1110,9 +1110,21 @@ class LlamaModel(LlamaPreTrainedModel):
 
 class KwargsForCausalLM(FlashAttentionKwargs, LossKwargs): ...
 
+import GPUtil
+import time
+def get_gpu_usage():
+    gpus = GPUtil.getGPUs()
+    total = 0
+    for gpu in gpus:
+        total += gpu.memoryUsed
+    return total
+
 
 class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
     _tied_weights_keys = ["lm_head.weight"]
+
+    used_gpu = []
+    time_metric = []
 
     def __init__(self, config):
         super().__init__(config)
@@ -1122,6 +1134,11 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
 
         # Initialize weights and apply final processing
         self.post_init()
+
+    @staticmethod
+    def clear():
+        LlamaForCausalLM.used_gpu = []
+        LlamaForCausalLM.time_metric = []
 
     def get_input_embeddings(self):
         return self.model.embed_tokens
@@ -1226,6 +1243,9 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
         if not return_dict:
             output = (logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
+
+        LlamaForCausalLM.used_gpu.append(get_gpu_usage())
+        LlamaForCausalLM.time_metric.append(time.time())
 
         return CausalLMOutputWithPast(
             loss=loss,
