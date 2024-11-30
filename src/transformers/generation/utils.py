@@ -3489,6 +3489,8 @@ class GenerationMixin:
                 next_token_logits, dim=-1
             )  # (batch_size * num_beams, vocab_size)
 
+            print(cur_len, "next scores ", next_token_scores)
+
             next_token_scores_processed = logits_processor(input_ids, next_token_scores)
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(
                 next_token_scores_processed

@@ -645,7 +645,7 @@ class ConstrainedBeamSearchScorer(BeamScorer):
                 next_beam_tokens[batch_idx],
                 next_beam_indices[batch_idx],
             )
-            print(f"{cur_len} new scores: {new_scores}")
+            
 
             next_beam_scores[batch_idx] = new_scores
             next_beam_tokens[batch_idx] = new_tokens
@@ -661,7 +661,7 @@ class ConstrainedBeamSearchScorer(BeamScorer):
             self._done[batch_idx] = self._done[batch_idx] or beam_hyp.is_done(
                 next_scores[batch_idx].max().item(), cur_len, decoder_prompt_len
             )
-
+        
         return UserDict(
             {
                 "next_beam_scores": next_beam_scores.view(-1),
