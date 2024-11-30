@@ -645,6 +645,7 @@ class ConstrainedBeamSearchScorer(BeamScorer):
                 next_beam_tokens[batch_idx],
                 next_beam_indices[batch_idx],
             )
+            print(f"{cur_len} new scores: {new_scores}")
 
             next_beam_scores[batch_idx] = new_scores
             next_beam_tokens[batch_idx] = new_tokens

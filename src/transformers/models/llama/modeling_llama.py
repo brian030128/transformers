@@ -1227,6 +1227,7 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
             **kwargs,
         )
 
+
         hidden_states = outputs[0]
         if self.config.pretraining_tp > 1:
             lm_head_slices = self.lm_head.weight.split(self.vocab_size // self.config.pretraining_tp, dim=0)
@@ -1235,17 +1236,21 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
         else:
             # Only compute necessary logits, and do not upcast them to float if we are not computing the loss
             logits = self.lm_head(hidden_states[:, -num_logits_to_keep:, :])
+        
 
         loss = None
         if labels is not None:
             loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
-
+        
+        
         if not return_dict:
             output = (logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
+        
 
         LlamaForCausalLM.used_gpu.append(get_gpu_usage())
         LlamaForCausalLM.time_metric.append(time.time())
+
 
         return CausalLMOutputWithPast(
             loss=loss,
