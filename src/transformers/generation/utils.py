@@ -3537,6 +3537,8 @@ class GenerationMixin:
             next_indices = torch.div(next_tokens, vocab_size, rounding_mode="floor")
             next_tokens = next_tokens % vocab_size
 
+            
+
             # stateless
             beam_outputs = beam_scorer.process(
                 input_ids,
@@ -3553,6 +3555,7 @@ class GenerationMixin:
             beam_next_tokens = beam_outputs["next_beam_tokens"]
             beam_idx = beam_outputs["next_beam_indices"]
 
+            print(cur_len, beam_scores)
 
             input_ids = torch.cat([input_ids[beam_idx, :], beam_next_tokens.unsqueeze(-1)], dim=-1)
 
