@@ -1320,6 +1320,7 @@ class PhimoeModel(PhimoePreTrainedModel):
                 )
         return causal_mask
 
+from ..metrics import measure
 
 class PhimoeForCausalLM(PhimoePreTrainedModel, GenerationMixin):
     _tied_weights_keys = ["lm_head.weight"]
@@ -1445,6 +1446,7 @@ class PhimoeForCausalLM(PhimoePreTrainedModel, GenerationMixin):
         if labels is not None:
             loss = self.loss_function(logits, labels, self.vocab_size, **loss_kwargs)
 
+
         aux_loss = None
         if output_router_logits:
             aux_loss = load_balancing_loss_func(
@@ -1455,6 +1457,8 @@ class PhimoeForCausalLM(PhimoePreTrainedModel, GenerationMixin):
             )
             if labels is not None:
                 loss += self.router_aux_loss_coef * aux_loss.to(loss.device)  # make sure to reside in the same device
+
+        measure()
 
         if not return_dict:
             output = (logits,) + outputs[1:]

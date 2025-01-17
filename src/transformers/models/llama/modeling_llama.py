@@ -1115,21 +1115,11 @@ from pynvml import nvmlDeviceGetMemoryInfo, nvmlShutdown
 from functools import lru_cache
 import time
 
-
-import GPUtil
-
-def get_gpu_usage():
-    gpus = GPUtil.getGPUs()
-    total = 0
-    for gpu in gpus:
-        total += gpu.memoryUsed
-    return total
+from ..metrics import measure
 
 class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
     _tied_weights_keys = ["lm_head.weight"]
 
-    used_gpu = []
-    time_metric = []
 
     def __init__(self, config):
         super().__init__(config)
@@ -1140,10 +1130,7 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
         # Initialize weights and apply final processing
         self.post_init()
 
-    @staticmethod
-    def clear():
-        LlamaForCausalLM.used_gpu = []
-        LlamaForCausalLM.time_metric = []
+
 
     def get_input_embeddings(self):
         return self.model.embed_tokens
@@ -1252,10 +1239,7 @@ class LlamaForCausalLM(LlamaPreTrainedModel, GenerationMixin):
             output = (logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
         
-
-        LlamaForCausalLM.used_gpu.append(get_gpu_usage())
-        LlamaForCausalLM.time_metric.append(time.time())
-
+        measure()
 
         return CausalLMOutputWithPast(
             loss=loss,
