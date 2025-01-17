@@ -45,6 +45,7 @@ from ...utils import (
     replace_return_docstrings,
 )
 from .configuration_phi3 import Phi3Config
+from ..metrics import measure
 
 
 logger = logging.get_logger(__name__)
@@ -1274,6 +1275,8 @@ class Phi3ForCausalLM(Phi3PreTrainedModel, GenerationMixin):
         loss = None
         if labels is not None:
             loss = self.loss_function(logits, labels, self.vocab_size, **loss_kwargs)
+
+        measure()
 
         if not return_dict:
             output = (logits,) + outputs[1:]
