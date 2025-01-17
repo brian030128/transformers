@@ -3,6 +3,7 @@ memory_metrics = []
 time_metrics = []
 
 def clear():
+    global memory_metrics, time_metrics
     memory_metrics = []
     time_metrics = []
 
