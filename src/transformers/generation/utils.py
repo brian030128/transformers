@@ -4675,7 +4675,7 @@ def stack_model_outputs(model_outputs: List[ModelOutput], config: PretrainedConf
                 )
             else:
                 return tuple(torch.cat([attr[i] for attr in data], dim=0) for i in range(len(data[0])))
-        elif isinstance(data[0], (int, float)):model_output_cls.__dataclass_fields__
+        elif isinstance(data[0], (int, float)):
             # If the elements are integers or floats, return a tensor
             return torch.tensor(data)
         else:
