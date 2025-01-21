@@ -3464,7 +3464,10 @@ class GenerationMixin:
                 outputs_per_sub_batch = [
                     self(**inputs_per_sub_batch, return_dict=True) for inputs_per_sub_batch in inputs_per_sub_batches
                 ]
-
+		    
+                for output in outputs_per_sub_batch:
+                    output["past_key_values"] = None
+			
                 outputs = stack_model_outputs(outputs_per_sub_batch, self.config.get_text_config())
 
             else:  # Unchanged original behavior
@@ -4672,7 +4675,7 @@ def stack_model_outputs(model_outputs: List[ModelOutput], config: PretrainedConf
                 )
             else:
                 return tuple(torch.cat([attr[i] for attr in data], dim=0) for i in range(len(data[0])))
-        elif isinstance(data[0], (int, float)):
+        elif isinstance(data[0], (int, float)):model_output_cls.__dataclass_fields__
             # If the elements are integers or floats, return a tensor
             return torch.tensor(data)
         else:
@@ -4680,8 +4683,8 @@ def stack_model_outputs(model_outputs: List[ModelOutput], config: PretrainedConf
 
     # Use a dictionary comprehension to gather attributes from all objects and concatenate them
     concatenated_data = {
-        k: _concat([getattr(model_output, k) for model_output in model_outputs])
-        for k in model_output_cls.__dataclass_fields__.keys()
+        k: _concat(model_output[0] for model_output in model_outputs])
+        for k in model_outputs[0].keys()
     }
 
     # Return a new object of the inferred class with the concatenated attributes
