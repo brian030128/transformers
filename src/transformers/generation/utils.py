@@ -4683,7 +4683,7 @@ def stack_model_outputs(model_outputs: List[ModelOutput], config: PretrainedConf
 
     # Use a dictionary comprehension to gather attributes from all objects and concatenate them
     concatenated_data = {
-        k: _concat([model_output[0] for model_output in model_outputs])
+        k: _concat([model_output[k] for model_output in model_outputs])
         for k in model_outputs[0].keys()
     }
 
