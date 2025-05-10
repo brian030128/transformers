@@ -49,7 +49,7 @@ from ...utils import (
     replace_return_docstrings,
 )
 from .configuration_mistral import MistralConfig
-
+from ..metrics import measure
 
 if is_flash_attn_2_available():
     from ...modeling_flash_attention_utils import _flash_attention_forward
@@ -1101,7 +1101,7 @@ class MistralForCausalLM(MistralPreTrainedModel, GenerationMixin):
         if not return_dict:
             output = (logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
-
+        measure()
         return CausalLMOutputWithPast(
             loss=loss,
             logits=logits,
